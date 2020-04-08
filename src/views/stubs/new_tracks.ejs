@@ -1,0 +1,33 @@
+<div class="list-group mt-3 mb-3" id="new-tracks-list">
+    <div id="date-artist-was-checked" style="display: hidden" data-date="<%= dateArtistWasChecked %>"></div>
+    <% newTracks.forEach(track => { %>
+    <div
+        class="list-group-item list-group-item-action list-group-item-light d-flex flex-row justify-content-start align-items-center">
+        <input type="checkbox" class="mr-3" data-track-uri="<%= track.uri %>" />
+        <img class="img-thumbnail mr-3" style="width: 70px"
+            src="<%= track.album && track.album.images.length ? track.album.images[track.album.images.length - 1].url : "/static/images/Missing.png" %>"
+            alt="Thumbnail for <%= track.album ? track.album.name : track.name %>" />
+        <div class="d-flex flex-column mr-auto">
+            <h5 class="mb-1"><%= track.name %></h5>
+            <p class="mb-0">
+                <% if (track.explicit) { %>
+                <span class="badge badge-secondary">E</span>
+                <% } %>
+                <b><%= track.artists.length ? track.artists.map(artist => artist.name).join(", ") : "Various Artists" %></b>
+                <% if (track.album) { %>
+                &mdash;
+                <%= track.album.name %>
+                <% } %>
+            </p>
+        </div>
+        <div class="d-flex flex-column text-right">
+            <small>
+                <%= formatLength(track.duration_ms) %>
+            </small>
+            <small>
+                <a href="<%= track.external_urls.spotify %>" target="_blank">Listen</a>
+            </small>
+        </div>
+    </div>
+    <% }); %>
+</div>

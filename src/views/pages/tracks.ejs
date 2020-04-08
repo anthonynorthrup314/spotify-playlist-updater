@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../partials/head") %>
+
+    <script src="/static/scripts/Refresh.js"></script>
+</head>
+
+<body class="container bg-secondary">
+
+    <header>
+        <%- include("../partials/header") %>
+    </header>
+
+    <main>
+        <div class="jumbotron">
+            <a href="/playlist/<%= playlist.id %>"
+                class="list-group-item list-group-item-action list-group-item-light mb-3">
+                <div class="d-flex flex-row justify-content-start align-items-center">
+                    <img class="img-thumbnail mr-3" style="width: 120px"
+                        src="<%= playlist.info.images.length ? playlist.info.images[0].url : "/static/images/Missing.png" %>"
+                        alt="Thumbnail for <%= playlist.info.name %>" />
+                    <div class="d-flex flex-column mr-auto">
+                        <% if (playlist.info.description) { %>
+                        <h3 class="mb-1"><%= playlist.info.name %></h3>
+                        <h5 class="mb-0"><%= playlist.info.description %></h5>
+                        <% } else { %>
+                        <h3 class="mb-0"><%= playlist.info.name %></h3>
+                        <% } %>
+                    </div>
+                    <div class="d-flex flex-column justify-content-end text-right">
+                        <p class="mb-1">
+                            <%= playlist.info.tracks.total %>
+                            track<%= playlist.info.tracks.total === 1 ? "" : "s" %>
+                        </p>
+                        <p class="mb-0"><%= playlist.updatedMessage %></p>
+                    </div>
+                </div>
+            </a>
+
+            <% if (!tracks.length) { %>
+            <button class="btn btn-success" onclick="refresh(this, '<%= playlist.id %>')">Refresh Tracks</button>
+
+            <h3 class="text-muted mb-3">No tracks</h3>
+            <% } else { %>
+            <div class="d-flex flex-row justify-content-end align-items-center">
+                <%- include("../partials/pagination") %>
+
+                <button class="btn btn-success" onclick="refresh(this, '<%= playlist.id %>')">Refresh Tracks</button>
+            </div>
+
+            <div class="list-group mt-3 mb-3">
+                <% tracks.forEach(track => { %>
+                <a href="<%= track.external_urls.spotify %>" target="_blank"
+                    class="list-group-item list-group-item-action list-group-item-light d-flex flex-row justify-content-start align-items-center">
+                    <img class="img-thumbnail mr-3" style="width: 70px"
+                        src="<%= track.album && track.album.images.length ? track.album.images[track.album.images.length - 1].url : "/static/images/Missing.png" %>"
+                        alt="Thumbnail for <%= track.album ? track.album.name : track.name %>" />
+                    <div class="d-flex flex-column mr-auto">
+                        <h5 class="mb-1"><%= track.name %></h5>
+                        <p class="mb-0">
+                            <% if (track.explicit) { %>
+                            <span class="badge badge-secondary">E</span>
+                            <% } %>
+                            <b><%= track.artists.length ? track.artists.map(artist => artist.name).join(", ") : "Various Artists" %></b>
+                            <% if (track.album) { %>
+                            &mdash;
+                            <%= track.album.name %>
+                            <% } %>
+                        </p>
+                    </div>
+                    <small>
+                        <%= formatLength(track.duration_ms) %>
+                    </small>
+                </a>
+                <% }); %>
+            </div>
+            <% } %>
+
+            <%- include("../partials/pagination") %>
+        </div>
+    </main>
+
+    <footer>
+        <%- include("../partials/footer") %>
+    </footer>
+
+</body>
+
+</html>
