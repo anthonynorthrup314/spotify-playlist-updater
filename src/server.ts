@@ -22,7 +22,7 @@ import { TokenResponse, SIGNED_COOKIE_ACCESS_TOKEN, COOKIE_RETURN_URL, SIGNED_CO
 
 // Handle the config
 dotenv.config();
-const port = +process.env.SERVER_PORT;
+const port = +process.env.PORT;
 const hostUrl = process.env.HOST_URL || `http://localhost:${port}`;
 const spotifyAuthParams = {
     client_id: process.env.CLIENT_ID,
