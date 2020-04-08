@@ -418,7 +418,7 @@ app.use(cookieParser(cookieSecret));
 app.use("/static", express.static(path.join(__dirname, "./public")));
 
 // Setup the DB
-lowdb(new FileAsync(path.join(__dirname, "./db.json")))
+lowdb(new FileAsync(path.join(__dirname, "../db.json")))
     .then((db: DbType) => {
         // Setup the routes
         app.get("/", handleAsync(async (req, res) => {
