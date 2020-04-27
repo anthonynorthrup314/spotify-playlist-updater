@@ -57,6 +57,7 @@ export interface TrackWithAlbum extends TrackObjectSimplified {
 
 export enum AlbumGroup {
     album = "album",
+    // eslint-disable-next-line @typescript-eslint/camelcase
     appears_on = "appear_on",
     compilation = "compilation",
     single = "single"

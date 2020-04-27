@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function refresh(self: HTMLButtonElement, playlistID?: string): Promise<void> {
     // Disable the button
     const button = $(self);

@@ -1,11 +1,15 @@
-let playlistID: string = "";
+// eslint-disable-next-line prefer-const
+let playlistID = "";
+
+let errorModalVisible = false;
+let nextCheckedState = false;
 let refreshOnModalHide = false;
 let requestID = 0;
-let errorModalVisible = false;
 
 const modal: JQuery<HTMLDivElement> = $("#updateModal");
 const modalHeader: JQuery<HTMLHeadingElement> = $("#updateModalLabel");
 const modalBody: JQuery<HTMLDivElement> = $("#updateModalBody");
+const toggleButton: JQuery<HTMLButtonElement> = $("#toggleButton");
 const submitButton: JQuery<HTMLButtonElement> = $("#submitButton");
 const updateButton: JQuery<HTMLButtonElement> = $("#updateButton");
 
@@ -17,7 +21,8 @@ modal.on("show.bs.modal", () => {
     if (modalBody.find("input[type=checkbox]").length)
         return;
 
-    // Disable the submit button
+    // Disable some buttons
+    toggleButton.prop("disabled", true);
     submitButton.prop("disabled", true);
 
     // Update the content to a spinner
@@ -43,6 +48,15 @@ modal.on("hidden.bs.modal", () => {
     else
         // Enable the update button again
         updateButton.prop("disabled", false);
+});
+
+toggleButton.on("click", () => {
+    // Toggle all the checkboxes
+    for (const checkbox of modalBody.find("input[type=checkbox]"))
+        $(checkbox).prop("checked", nextCheckedState);
+
+    // Handle the switch
+    handleCheckboxState();
 });
 
 submitButton.on("click", async () => {
@@ -92,7 +106,7 @@ async function getLatestTracks(): Promise<void> {
     const content = await resp.text();
     modalBody.html(content);
 
-    if (resp.status === 200) {
+    if (resp.status === 200 && !resp.headers.has("X-No-Tracks")) {
         // If initial update, enable refresh on close
         if (resp.headers.get("X-Initial-Update") === "true")
             refreshOnModalHide = true;
@@ -106,22 +120,47 @@ async function getLatestTracks(): Promise<void> {
             // Handle clicking on group items
             modalBody.find(".list-group-item-action").on("click", newTrackClicked);
             modalBody.find(".list-group-item-action a").on("click", newTrackLinkClicked);
+            modalBody.find(".list-group-item-action input[type=checkbox]").on("click", newTrackCheckboxClicked);
 
             // Update the title to specify the number of tracks
             modalHeader.text(`${checkboxes.length} New Track${checkboxes.length === 1 ? "" : "s"}`);
-        }
 
-        // Enable the submit button
-        submitButton.prop("disabled", false);
+            // Update the checkboxes
+            handleCheckboxState();
+
+            // Enable the buttons
+            toggleButton.prop("disabled", false);
+            submitButton.prop("disabled", false);
+        }
     } else
         // Refresh when closed
         refreshOnModalHide = true;
 }
 
+function handleCheckboxState(): void {
+    // Count how many are checked
+    const checkboxes = modalBody.find("input[type=checkbox]");
+    let checked = 0;
+    for (const checkbox of checkboxes)
+        if ($(checkbox).prop("checked"))
+            checked++;
+
+    // Update the buttons
+    nextCheckedState = checked !== checkboxes.length; // All selected ? clicking toggle will unselect (aka false) : clicking toggle will select (aka true)
+    toggleButton.text(`${nextCheckedState ? "Select" : "Unselect"} All`);
+    submitButton.text(`Add ${checked} track${checked === 1 ? "" : "s"}`);
+}
+
 const newTrackClicked: (this: HTMLElement) => void = function () {
     const checkbox = $(this).find("input[type=checkbox]");
     checkbox.prop("checked", !checkbox.prop("checked"));
+    handleCheckboxState();
 };
+
+function newTrackCheckboxClicked(e: Event): void {
+    e.stopPropagation();
+    handleCheckboxState();
+}
 
 function newTrackLinkClicked(e: Event): void {
     e.stopPropagation();

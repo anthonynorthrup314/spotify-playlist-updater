@@ -77,8 +77,10 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" id="updateModalBody"></div>
+                    <div class="modal-body" id="updateModalBody"
+                        style="max-height: calc(100vh - 12rem); overflow-y: auto;"></div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-info" id="toggleButton">Unselect All</button>
                         <button type="button" class="btn btn-success" id="submitButton">Add Tracks</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     </div>
