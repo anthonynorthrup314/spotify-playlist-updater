@@ -1,6 +1,6 @@
 # spotify-playlist-updater
 
-Update playlists with new music from the artist of the playlist. This app is targetted
+Update playlists with new music from the artist of the playlist. This app is targeted
 at public single artist playlists created by the user via Spotify. I am still working
 on the creation feature, but listing / updating should be fully functional. See below
 for more information on how this can be used.
@@ -11,6 +11,10 @@ to your Spotify account in the browser, this should function as intended.
 Note: If you'd like to list / update private playlists, simply update the `SCOPE` variable
 within your `.env` file (or environment variables) to add `playlist-read-private playlist-modify-private`.
 More details can be found within the [Spotify Web API documentation](https://developer.spotify.com/documentation/general/guides/scopes/).
+
+## Try It!
+
+You can try this repo hosted with Heroku here: [https://spotify-playlist-updater.herokuapp.com/](https://spotify-playlist-updater.herokuapp.com/)
 
 ## Tech Stack
 
@@ -39,6 +43,7 @@ Refer to the package.json file for a complete rundown, but here is a brief summa
     - When first clicked, this will detect the artist for the playlist
     - The tracks are cached for 7 days. You can click Refresh Playlist to get the latest
 1. Once the dialog appears with the newly detected tracks, click Add Tracks
+    - Note: Tracks are only displayed if they were released since the last update to the playlist. If you'd like to find other music for the artist released before the last update to the playlist, this must be done manually.
 1. Repeat as needed
 
 ## Planned Features

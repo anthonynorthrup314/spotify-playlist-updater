@@ -215,6 +215,9 @@ export class App {
         const dbPlaylist = this.db.get("playlists").find(p => p.id === id);
         let playlist = dbPlaylist.value();
 
+        // Error message
+        let mainArtistError = "Could not identify main artist. Unable to find new tracks.";
+
         // Main artist identified?
         if (!playlist.variousArtists && !playlist.mainArtist) {
             // Search the first page of songs
@@ -248,9 +251,11 @@ export class App {
             if (mainArtist) {
                 // Ensure the percentage is above some threshold
                 const entry = artistsFound.get(mainArtist);
-                if (entry.count < App.mainArtistThreshold * playlist.cache.length)
+                if (entry.count < App.mainArtistThreshold * playlist.cache.length) {
                     // Not good enough
                     mainArtist = null;
+                    mainArtistError = `Main artist does not appear in at least ${App.mainArtistThreshold * 100}% of the tracks. Unable to properly identify.`;
+                }
             } else if (artistsFound.size) {
                 // Take the artist that occurred the most within the playlist
                 const entries: artistEntry[] = [];
@@ -258,7 +263,10 @@ export class App {
                 const mainArtistEntry = entries.sort((a, b) => b.count - a.count)[0];
                 if (mainArtistEntry.count > App.mainArtistThreshold * playlist.cache.length)
                     mainArtist = mainArtistEntry.info.id;
-            }
+                else
+                    mainArtistError = "Playlist appears to contain multiple artists. Please ensure there are enough tracks by the desired artist.";
+            } else
+                mainArtistError = "Unable to identify main artist. Please ensure the playlist already contains tracks by the desired artist.";
 
             // Main artist found?
             if (mainArtist) {
@@ -280,6 +288,10 @@ export class App {
                 // Find the date of the last track that was added
                 let lastUpdated = playlist.lastUpdated;
                 for (const track of playlist.cache) {
+                    // Local tracks don't support this property...
+                    if (track.is_local || !track.album || !track.album.release_date)
+                        continue;
+
                     const parts = track.album.release_date.split("-");
                     let date: Date;
                     if (parts.length === 0)
@@ -311,7 +323,7 @@ export class App {
             playlist = dbPlaylist.value();
         }
         if (playlist.variousArtists) {
-            res.status(404).send("Could not identify main artist. Unable to find new tracks.");
+            res.status(404).send(mainArtistError);
             return;
         }
 
